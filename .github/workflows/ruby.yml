@@ -1,9 +1,5 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
-# For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
+# This workflow installs Ruby dependencies and runs the Ruby client test
+# (connect_test.rb) against a live xlsql server.
 
 name: Ruby
 
@@ -18,7 +14,6 @@ permissions:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,13 +21,47 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Start the xlsql server on a fresh data file so it never collides with
+    # repository files, then wait for port 5432 to accept connections.
+    - name: Start xlsql server
+      run: |
+        python server.py --host 127.0.0.1 --port 5432 --data ./ci_data.xlsx > server.log 2>&1 &
+        echo $! > server.pid
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+        if ! (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+          echo "server did not start" >&2
+          cat server.log >&2
+          exit 1
+        fi
+
     - name: Set up Ruby
-    # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-    # change this to (see https://github.com/ruby/setup-ruby#versioning):
-    # uses: ruby/setup-ruby@v1
-      uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - name: Run tests
-      run: bundle exec rake
+        bundler-cache: true
+
+    - name: Run Ruby client test
+      run: bundle exec ruby connect_test.rb
+
+    - name: Stop xlsql server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          kill $(cat server.pid) || true
+        fi
