@@ -1,6 +1,9 @@
 import psycopg
 
-conn = psycopg.connect("host=127.0.0.1 port=54330 dbname=test user=test password=test")
+conn = psycopg.connect(
+    "host=127.0.0.1 port=5432 dbname=test user=test password=test",
+    connect_timeout=3,
+)
 conn.autocommit = True
 cur = conn.cursor()
 
