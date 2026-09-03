@@ -1,6 +1,9 @@
 XLSQL DATABASE SERVER
 =====================
 
+[![Python build](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml)
+[![PHP client test](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml)
+
 It's an SQL server using Excel spreadsheets for the tables. I'm not sure why.
 
 
