@@ -1,7 +1,7 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# This workflow installs Node.js dependencies and runs the JavaScript client
+# test (test_connect.js) against a live xlsql server.
 
-name: Node.js CI
+name: Node.js client
 
 on:
   push:
@@ -9,15 +9,16 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v4
@@ -26,6 +27,44 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Start the xlsql server on a fresh data file so it never collides with
+    # repository files, then wait for port 5432 to accept connections.
+    - name: Start xlsql server
+      run: |
+        python server.py --host 127.0.0.1 --port 5432 --data ./ci_data.xlsx > server.log 2>&1 &
+        echo $! > server.pid
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+        if ! (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+          echo "server did not start" >&2
+          cat server.log >&2
+          exit 1
+        fi
+
+    - name: Install npm dependencies
+      run: npm ci
+
+    - name: Run Node.js client test
+      run: npm test
+
+    - name: Stop xlsql server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          kill $(cat server.pid) || true
+        fi
