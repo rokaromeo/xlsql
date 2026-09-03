@@ -4,6 +4,7 @@ XLSQL DATABASE SERVER
 [![Python](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml)
 [![PHP](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml)
 [![Node.js](https://github.com/rokaromeo/xlsql/actions/workflows/node.js.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/node.js.yml)
+[![Go](https://github.com/rokaromeo/xlsql/actions/workflows/go.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/go.yml)
 
 It's an SQL server using Excel spreadsheets for the tables. I'm not sure why.
 

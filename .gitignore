@@ -6,3 +6,6 @@
 **/__pycache__/**
 **/build/**
 node_modules/
+*.exe
+*.log
+server.pid

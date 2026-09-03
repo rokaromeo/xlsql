@@ -1,5 +1,5 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+# This workflow installs Go dependencies and runs the Go client test
+# (test_connect.go) against a live xlsql server.
 
 name: Go
 
@@ -9,20 +9,58 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
+permissions:
+  contents: read
 
+jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version: '1.21'
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Start the xlsql server on a fresh data file so it never collides with
+    # repository files, then wait for port 5432 to accept connections.
+    - name: Start xlsql server
+      run: |
+        python server.py --host 127.0.0.1 --port 5432 --data ./ci_data.xlsx > server.log 2>&1 &
+        echo $! > server.pid
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+        if ! (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+          echo "server did not start" >&2
+          cat server.log >&2
+          exit 1
+        fi
 
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+    - name: Run Go client test
+      run: go run .
+
+    - name: Stop xlsql server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          kill $(cat server.pid) || true
+        fi
