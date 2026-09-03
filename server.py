@@ -28,9 +28,9 @@ def main():
             _, columns, rows = result
             return {"kind": "select", "columns": columns, "rows": rows}
         if kind == "create":
-            return {"kind": "create", "name": result[1]}
+            return {"kind": "create", "name": result[1], "created": result[2]}
         if kind == "drop":
-            return {"kind": "drop", "name": result[1]}
+            return {"kind": "drop", "name": result[1], "dropped": result[2]}
         if kind == "insert":
             return {"kind": "insert", "newid": result[1]}
         if kind == "update":

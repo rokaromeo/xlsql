@@ -186,10 +186,12 @@ class PgConnection:
             self.send_message("C", self.build_command_complete(f"SELECT {len(rows)}"))
         elif kind == "create":
             name = result["name"]
-            self.send_message("C", self.build_command_complete(f"CREATE TABLE {name}"))
+            created = result.get("created", True)
+            self.send_message("C", self.build_command_complete(f"CREATE TABLE {name}" if created else f"CREATE TABLE {name} (skipped, already present)"))
         elif kind == "drop":
             name = result["name"]
-            self.send_message("C", self.build_command_complete(f"DROP TABLE {name}"))
+            dropped = result.get("dropped", True)
+            self.send_message("C", self.build_command_complete(f"DROP TABLE {name}" if dropped else f"DROP TABLE {name} (skipped, not present)"))
         elif kind == "insert":
             newid = result["newid"]
             self.send_message("C", self.build_command_complete("INSERT 0 1"))

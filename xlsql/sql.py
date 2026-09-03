@@ -99,6 +99,16 @@ def parse_create(p):
     if (kind, val) != ("IDENT", "table"):
         raise SQLSyntaxError("CREATE requires TABLE")
     name = p.expect_ident()
+    if_present = False
+    not_present = False
+    if p.peek() == ("IDENT", "if"):
+        p.next()
+        if p.peek() == ("IDENT", "not"):
+            p.next()
+            not_present = True
+        if p.next() != ("IDENT", "present"):
+            raise SQLSyntaxError("expected PRESENT after IF")
+        if_present = True
     _, paren = p.next()
     if paren != "(":
         raise SQLSyntaxError("expected ( after CREATE TABLE name")
@@ -125,7 +135,7 @@ def parse_create(p):
             p.next()
             break
         raise SQLSyntaxError("expected , or ) in column list")
-    return ("create", name, columns)
+    return ("create", name, columns, not_present)
 
 
 def parse_drop(p):
@@ -133,7 +143,13 @@ def parse_drop(p):
     if (kind, val) != ("IDENT", "table"):
         raise SQLSyntaxError("DROP requires TABLE")
     name = p.expect_ident()
-    return ("drop", name)
+    if_present = False
+    if p.peek() == ("IDENT", "if"):
+        p.next()
+        if p.next() != ("IDENT", "present"):
+            raise SQLSyntaxError("expected PRESENT after IF")
+        if_present = True
+    return ("drop", name, if_present)
 
 
 def parse_insert(p):
@@ -371,14 +387,18 @@ class Executor:
         raise SQLSyntaxError(f"unsupported statement: {stmt}")
 
     def do_create(self, parsed):
-        _, name, columns = parsed
+        _, name, columns, if_not_present = parsed
+        if if_not_present and self.db.table_exists(name):
+            return ("create", name, False)
         self.db.create_table(name, columns)
-        return ("create", name)
+        return ("create", name, True)
 
     def do_drop(self, parsed):
-        _, name = parsed
+        _, name, if_present = parsed
+        if if_present and not self.db.table_exists(name):
+            return ("drop", name, False)
         self.db.drop_table(name)
-        return ("drop", name)
+        return ("drop", name, True)
 
     def do_insert(self, parsed):
         _, name, columns, values = parsed

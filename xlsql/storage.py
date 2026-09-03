@@ -116,6 +116,10 @@ class Database:
                 f[:-5] for f in os.listdir(self.dirpath) if f.endswith(".xlsx")
             )
 
+    def table_exists(self, name):
+        with self._lock:
+            return os.path.exists(self._path(name))
+
     def create_table(self, name, columns):
         with self._lock:
             path = self._path(name)
