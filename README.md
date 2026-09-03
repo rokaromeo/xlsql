@@ -117,4 +117,4 @@ TODO
 - Column data types - later.
 - ORDER BY / LIMIT / OFFSET - later.
 - Aggregate functions - later.
-- The server does not exit when I press ctrl+c in the terminal, it keeps running. I pressed the ctrl+c key combination more than two times in rapid succession. Implement a feature to gracefully quit if someone presses ctrl+c.
+- The server does not exit when I press ctrl+c in the terminal, it keeps running. I pressed the ctrl+c key combination more than two times in rapid succession. Implement a feature to gracefully quit if someone presses ctrl+c. - I tried this just now, works.
