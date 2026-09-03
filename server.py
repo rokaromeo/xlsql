@@ -2,6 +2,7 @@ import argparse
 import os
 import signal
 import sys
+from datetime import datetime
 
 from xlsql.protocol import PgServer
 from xlsql.sql import Executor, SQLSyntaxError
@@ -19,7 +20,7 @@ def main():
     executor = Executor(db)
 
     def log(msg):
-        print(f"[{os.getpid()}] {msg}", flush=True)
+        print(f"[{os.getpid()}] [{datetime.now()}] {msg}", flush=True)
 
     def on_query(sql):
         result = executor.execute(sql)
