@@ -132,6 +132,7 @@ conn.close()
 
 ```php
 <?php
+
 $dsn  = 'pgsql:host=127.0.0.1;port=5432;dbname=test';
 $user = 'test';
 $pass = 'test';
@@ -146,7 +147,6 @@ $stmt = $pdo->query("SELECT * FROM users");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     print_r($row);
 }
-?>
 ```
 
 Any PostgreSQL-compatible client that can do it, can do it here.
