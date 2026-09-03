@@ -1,9 +1,15 @@
+import sys
+
 import psycopg
 
-conn = psycopg.connect(
-    "host=127.0.0.1 port=5432 dbname=test user=test password=test",
-    connect_timeout=3,
-)
+try:
+    conn = psycopg.connect(
+        "host=127.0.0.1 port=5432 dbname=test user=test password=test",
+        connect_timeout=3,
+    )
+except psycopg.Error as e:
+    print(f"could not connect: {e}")
+    sys.exit(1)
 conn.autocommit = True
 cur = conn.cursor()
 

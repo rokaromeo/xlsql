@@ -382,6 +382,8 @@ class Executor:
             return self.do_update(parse_update(p))
         if stmt == "DELETE":
             return self.do_delete(parse_delete(p))
+        if stmt == "DEALLOCATE":
+            return ("noop",)
         raise SQLSyntaxError(f"unsupported statement: {stmt}")
 
     def do_create(self, parsed):

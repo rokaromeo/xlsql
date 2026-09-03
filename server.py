@@ -37,6 +37,8 @@ def main():
             return {"kind": "update", "changed": result[1]}
         if kind == "delete":
             return {"kind": "delete", "deleted": result[1]}
+        if kind == "noop":
+            return {"kind": "noop"}
         raise SQLSyntaxError(f"unsupported result kind: {kind}")
 
     log(f"xlsql server starting on {args.host}:{args.port}, data dir: {os.path.abspath(args.data)}")

@@ -150,6 +150,8 @@ class PgConnection:
         self.send_ready()
 
     def _main_loop(self):
+        self._stmt_result = None
+        self._stmt_error = False
         while True:
             msg_type, body = self.recv_message()
             if msg_type == b"Q":
@@ -157,10 +159,75 @@ class PgConnection:
             elif msg_type == b"X":
                 return
             elif msg_type == b"P":
-                pass  # extended query parse - unsupported, skip
+                self._handle_parse(body)
+            elif msg_type == b"B":
+                self._handle_bind()
+            elif msg_type == b"D":
+                self._handle_describe(body)
+            elif msg_type == b"E":
+                self._handle_execute()
+            elif msg_type == b"S":
+                # in extended protocol, errors are reset at Sync
+                self._stmt_error = False
+                self.send_ready()
+            elif msg_type == b"C":
+                pass  # Close - nothing to close
             else:
                 if self.logger:
                     self.logger(f"ignoring message type {msg_type!r}")
+
+    def _handle_parse(self, body):
+        # [stmt_name\0][query\0][int16 nparams][oid...]
+        parts = body.split(b"\x00", 2)
+        if len(parts) < 2:
+            self._fail_parse("malformed parse message")
+            return
+        sql = parts[1].decode("utf-8").strip()
+        self.log("SQL", sql)
+        try:
+            self._stmt_result = self.on_query(sql)
+        except Exception as e:
+            self.log("ERROR", str(e))
+            self._fail_parse(f"{type(e).__name__}: {e}")
+            return
+        self._stmt_error = False
+        self.send_message("1", b"")  # ParseComplete
+
+    def _fail_parse(self, message):
+        self._stmt_error = True
+        self._stmt_result = None
+        self.send_error("42601", message)
+
+    def _handle_bind(self):
+        if self._stmt_error:
+            return
+        if self._stmt_result is None:
+            return
+        self.send_message("2", b"")  # BindComplete
+
+    def _handle_describe(self, body):
+        # [b'P'|b'S'][name\0]
+        if self._stmt_error:
+            return
+        if self._stmt_result is None:
+            return
+        if self._stmt_result["kind"] == "select":
+            self.send_message("T", self.build_row_description(self._stmt_result["columns"]))
+        else:
+            self.send_message("n", b"")  # NoData
+
+    def _handle_execute(self):
+        if self._stmt_error:
+            return
+        if self._stmt_result is None:
+            return
+        result = self._stmt_result
+        if result["kind"] == "select":
+            for row in result["rows"]:
+                self.send_message("D", self.build_data_row(row))
+            self.send_message("C", self.build_command_complete(f"SELECT {len(result['rows'])}"))
+        else:
+            self.send_message("C", self._command_tag(result))
 
     def _handle_query(self, body):
         sql = body.rstrip(b"\x00").decode("utf-8").strip()
@@ -175,6 +242,26 @@ class PgConnection:
         self._send_result(result, sql)
         self.send_ready()
 
+    def _command_tag(self, result):
+        kind = result["kind"]
+        if kind == "create":
+            name = result["name"]
+            created = result.get("created", True)
+            return f"CREATE TABLE {name}" if created else f"CREATE TABLE {name} (skipped, already present)"
+        if kind == "drop":
+            name = result["name"]
+            dropped = result.get("dropped", True)
+            return f"DROP TABLE {name}" if dropped else f"DROP TABLE {name} (skipped, not present)"
+        if kind == "insert":
+            return "INSERT 0 1"
+        if kind == "update":
+            return f"UPDATE {result['changed']}"
+        if kind == "delete":
+            return f"DELETE {result['deleted']}"
+        if kind == "noop":
+            return "OK"
+        return "OK"
+
     def _send_result(self, result, sql):
         kind = result["kind"]
         if kind == "select":
@@ -184,25 +271,8 @@ class PgConnection:
             for row in rows:
                 self.send_message("D", self.build_data_row(row))
             self.send_message("C", self.build_command_complete(f"SELECT {len(rows)}"))
-        elif kind == "create":
-            name = result["name"]
-            created = result.get("created", True)
-            self.send_message("C", self.build_command_complete(f"CREATE TABLE {name}" if created else f"CREATE TABLE {name} (skipped, already present)"))
-        elif kind == "drop":
-            name = result["name"]
-            dropped = result.get("dropped", True)
-            self.send_message("C", self.build_command_complete(f"DROP TABLE {name}" if dropped else f"DROP TABLE {name} (skipped, not present)"))
-        elif kind == "insert":
-            newid = result["newid"]
-            self.send_message("C", self.build_command_complete("INSERT 0 1"))
-        elif kind == "update":
-            n = result["changed"]
-            self.send_message("C", self.build_command_complete(f"UPDATE {n}"))
-        elif kind == "delete":
-            n = result["deleted"]
-            self.send_message("C", self.build_command_complete(f"DELETE {n}"))
         else:
-            self.send_message("C", self.build_command_complete("OK"))
+            self.send_message("C", self.build_command_complete(self._command_tag(result)))
 
     def log(self, tag, msg):
         if self.logger:
