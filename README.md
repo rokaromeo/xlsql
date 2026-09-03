@@ -1,125 +1,196 @@
-The xlsql database server project
-=================================
+<div align="center">
 
+# 📊 xlsql
 
+**The SQL database that lives in your Excel spreadsheets.**
 
-This project is just for fun. I want to see a bunch of xls files with the names of the SQL tables appear in a folder as I run a database migration and I want to open one of those xls files and see the database there normally, I want to go around and modify and see the test app SELECT result changes.
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](#license)
 
-So the xlsql database would be a very simple SQL database server, but it would store the data in Microsoft Excel xls spreadsheets. For the user's perspective it would look like a normal SQL server with basic SQL commands.
+*Because running a migration and watching real `.xlsx` files appear on disk is delightful.*
 
+</div>
 
+---
 
-Features
-========
+## 🤔 Wait, what?
 
-- The xlsql server runs from the terminal.
+`xlsql` is a tiny SQL database server that stores every table as a **plain, human-readable Excel file**.
 
-- Any PostgreSQL-compatible client can connect to it (standard PostgreSQL wire protocol).
+You run `CREATE TABLE users ...`, and a `users.xlsx` file magically appears in a folder. Open it in Excel, LibreOffice, or a text editor — there's your data. Edit the cell that has Alice's age, save, and the next `SELECT` picks it right up.
 
-- SQL request/response log messages are shown in the terminal when the server is running.
+It speaks the **standard PostgreSQL wire protocol**, so any PostgreSQL client (`psycopg`, PDO, psql, DBeaver…) can connect and just… work.
 
-- One separate xlsx file per table.
+> **The core idea:** A normal SQL server, but the storage layer is literally Excel files you can open and poke at.
 
-- Only one database supported.
+---
 
-- Column data types are not supported, everything is a string.
+## ✨ Features
 
+- 🗄️ **One `.xlsx` file per table** — open any table as a real spreadsheet.
+- 🔌 **PostgreSQL wire protocol** — connect with any PG-compatible client.
+- 🖥️ **Runs in the terminal** — every SQL request/response is logged live.
+- ✏️ **Human editable** — edit cells in Excel, see queries return new results.
+- 🚦 **Graceful shutdown** — hit <kbd>Ctrl</kbd>+<kbd>C</kbd> and it exits cleanly.
+- 🧠 **Tiny & dependency-light** — two packages, one module.
 
+---
 
-Supported DDL statements:
+## 📚 Supported SQL
 
-CREATE TABLE
-DROP TABLE
+### DDL (data definition)
 
+| Statement | Description |
+|-----------|-------------|
+| `CREATE TABLE name (col TEXT, col2 INT)` | Create a table. |
+| `CREATE TABLE IF NOT PRESENT name (...)` | Create only if it doesn't already exist. |
+| `DROP TABLE name` | Drop a table. |
+| `DROP TABLE IF PRESENT name` | Drop only if it exists. |
 
-Supported DQL statements:
+### DML (data manipulation)
 
-SELECT
-INSERT
-UPDATE
-DELETE
+| Statement | Description |
+|-----------|-------------|
+| `SELECT ... FROM tbl` | Select columns / `*`. |
+| `SELECT ... FROM tbl WHERE ...` | Filter with `=` `<>` `>` `<` `>=` `<=`, `AND`/`OR`. |
+| `INSERT INTO tbl (c1, c2) VALUES (v1, v2)` | Insert one row. |
+| `UPDATE tbl SET c = v [WHERE ...]` | Update matching rows. |
+| `DELETE FROM tbl [WHERE ...]` | Delete matching rows. |
 
+> **Not yet:** `ORDER BY`, `LIMIT`, `OFFSET`, aggregates, JOINs.
+> **Never, ever:** multiple databases. One is enough. This is a *fun* project.
 
-The xls files are human readable/modifiable, just a normal xlsx.
+---
 
-The data structure of the xlsx files:
-  - Only one sheet
-  - First row is reserved for the column names
-  - First column name is always "id", so the value of the cell A1 will be "id"
-  - First column is the primary key, auto increment from 1
+## 🗂️ How tables are stored
 
-The server creates a dir ".xlsql" where it's running, to store all those xlsx files.
+Each table = one `.xlsx` file in the data directory (`.xlsql` by default).
 
+- One worksheet per file.
+- **Row 1** = column names. Cell `A1` is always **`id`**.
+- The `id` column is the primary key, **auto-incrementing** from 1.
+- No column types — **everything is a string** (types in `CREATE` are accepted & ignored).
 
+```
+users.xlsx
+┌────┬────────┬─────┐
+│ id │ name   │ age │
+├────┼────────┼─────┤
+│ 1  │ Alice  │ 30  │
+│ 2  │ Bob    │ 25  │
+└────┴────────┴─────┘
+```
 
-How to run the server
-=====================
+Edit `Bob`'s age to `26` in Excel, save, and watch your `SELECT` change. 🎉
 
-Install dependencies:
+---
 
-    pip install openpyxl psycopg
+## 🚀 Getting started
 
-Start the server (defaults to 127.0.0.1:5432, data dir .xlsql):
+### 1. Install
 
-    python server.py
+```bash
+pip install openpyxl psycopg
+```
 
-Custom host, port, and data directory:
+### 2. Run the server
 
-    python server.py --host 0.0.0.0 --port 5433 --data /path/to/data
+```bash
+python server.py
+```
 
+Starts on `127.0.0.1:5432` and creates a `.xlsql` data folder.
+Stop it anytime with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
+Custom host, port, or data directory:
 
-Connect with Python (psycopg)
-=============================
+```bash
+python server.py --host 0.0.0.0 --port 5433 --data /path/to/data
+```
 
-    import psycopg
+### 3. Connect & query
 
-    conn = psycopg.connect("host=127.0.0.1 port=5432 dbname=test user=test password=test")
-    conn.autocommit = True
-    cur = conn.cursor()
+**Python (`psycopg`):**
 
-    cur.execute("CREATE TABLE users (name TEXT, age INT)")
-    cur.execute("INSERT INTO users (name, age) VALUES ('Alice', 30)")
-    cur.execute("SELECT * FROM users")
-    for row in cur.fetchall():
-        print(row)
+```python
+import psycopg
 
-    conn.close()
+conn = psycopg.connect("host=127.0.0.1 port=5432 dbname=test user=test password=test")
+conn.autocommit = True
+cur = conn.cursor()
 
+cur.execute("CREATE TABLE IF NOT PRESENT users (name TEXT, age INT)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Alice', 30)")
+cur.execute("SELECT * FROM users")
+for row in cur.fetchall():
+    print(row)
 
+conn.close()
+```
 
-Connect with PHP (PDO)
-======================
+**PHP (`PDO`):**
 
-    <?php
-    $dsn = 'pgsql:host=127.0.0.1;port=5432;dbname=test';
-    $user = 'test';
-    $pass = 'test';
+```php
+<?php
+$dsn  = 'pgsql:host=127.0.0.1;port=5432;dbname=test';
+$user = 'test';
+$pass = 'test';
 
-    $pdo = new PDO($dsn, $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$pdo = new PDO($dsn, $user, $pass);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $pdo->exec("CREATE TABLE users (name TEXT, age INT)");
-    $pdo->exec("INSERT INTO users (name, age) VALUES ('Alice', 30)");
+$pdo->exec("CREATE TABLE IF NOT PRESENT users (name TEXT, age INT)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Alice', 30)");
 
-    $stmt = $pdo->query("SELECT * FROM users");
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        print_r($row);
-    }
-    ?>
+$stmt = $pdo->query("SELECT * FROM users");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    print_r($row);
+}
+?>
+```
 
+Any PostgreSQL-compatible client that can do it, can do it here.
 
+---
 
-TODO
-====
+## 🧪 Running the tests
 
-- Multiple database support - no, do not implement this. Ever.
-- Column data types - later.
-- ORDER BY / LIMIT / OFFSET - later.
-- Aggregate functions - later.
-- The server does not exit when I press ctrl+c in the terminal, it keeps running. I pressed the ctrl+c key combination more than two times in rapid succession. Implement a feature to gracefully quit if someone presses ctrl+c. - I tried this just now, works.
+```bash
+python server.py            # terminal 1
+python test_connect.py      # terminal 2
+```
 
-- There is this line in the test:
-```print("== DROP TABLE (if present) ==")```
+The test connects over real PostgreSQL wire, runs through the DDL/DML flow, and
+cleans up the `.xlsql` folder afterward (even if it fails or you quit).
 
-I would like you to implement DROP TABLE IF PRESENT and CREATE TABLE IF NOT PRESENT functionality. These work like IF EXISTS, but I like the present.
+---
+
+## 🗺️ Roadmap (a.k.a. good ideas, someday)
+
+- [x] Graceful <kbd>Ctrl</kbd>+<kbd>C</kbd> shutdown
+- [x] `CREATE TABLE IF NOT PRESENT` / `DROP TABLE IF PRESENT`
+- [ ] `ORDER BY`, `LIMIT`, `OFFSET`
+- [ ] Aggregate functions
+- [ ] Column data types
+- [ ] ~~Multiple databases~~ → **never.** We said *one*. One is the fun one.
+
+---
+
+## 💡 Why?
+
+Because databases are cool, Excel is familiar, and watching actual spreadsheet
+files appear as you run SQL is weirdly satisfying. It's a tiny, playful project
+meant to be opened, edited, and explored — not to run your bank.
+
+---
+
+## License
+
+MIT — go have fun with it.
+
+<div align="center">
+
+**Made for the joy of watching `.xlsx` files appear.** 📂✨
+
+</div>
+

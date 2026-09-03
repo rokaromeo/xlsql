@@ -98,8 +98,6 @@ def parse_create(p):
     kind, val = p.next()
     if (kind, val) != ("IDENT", "table"):
         raise SQLSyntaxError("CREATE requires TABLE")
-    name = p.expect_ident()
-    if_present = False
     not_present = False
     if p.peek() == ("IDENT", "if"):
         p.next()
@@ -108,7 +106,7 @@ def parse_create(p):
             not_present = True
         if p.next() != ("IDENT", "present"):
             raise SQLSyntaxError("expected PRESENT after IF")
-        if_present = True
+    name = p.expect_ident()
     _, paren = p.next()
     if paren != "(":
         raise SQLSyntaxError("expected ( after CREATE TABLE name")
@@ -142,13 +140,13 @@ def parse_drop(p):
     kind, val = p.next()
     if (kind, val) != ("IDENT", "table"):
         raise SQLSyntaxError("DROP requires TABLE")
-    name = p.expect_ident()
     if_present = False
     if p.peek() == ("IDENT", "if"):
         p.next()
         if p.next() != ("IDENT", "present"):
             raise SQLSyntaxError("expected PRESENT after IF")
         if_present = True
+    name = p.expect_ident()
     return ("drop", name, if_present)
 
 
