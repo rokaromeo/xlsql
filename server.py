@@ -42,7 +42,7 @@ def main():
             return {"kind": "noop"}
         raise SQLSyntaxError(f"unsupported result kind: {kind}")
 
-    log(f"xlsql server starting on {args.host}:{args.port}, database file: {os.path.abspath(args.data)}.xlsx")
+    log(f"xlsql server starting on {args.host}:{args.port}, database file: {db.filepath}")
     log(f"tables found: {db.list_tables() or 'none'}")
 
     server = PgServer(args.host, args.port, on_query, logger=log)

@@ -94,6 +94,12 @@ class Database:
         self._wb = self._open(filepath)
 
     @staticmethod
+    def _ensure_parent(filepath):
+        parent = os.path.dirname(os.path.abspath(filepath))
+        if parent and not os.path.isdir(parent):
+            os.makedirs(parent, exist_ok=True)
+
+    @staticmethod
     def _open(filepath):
         if filepath and os.path.exists(filepath):
             return load_workbook(filepath)
@@ -103,6 +109,7 @@ class Database:
 
     def save(self):
         with self._lock:
+            self._ensure_parent(self.filepath)
             if not self._wb.sheetnames:
                 self._wb.create_sheet(title=META_SHEET)
             self._wb.save(self.filepath)
