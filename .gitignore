@@ -1,3 +1,6 @@
 .xlsql
+.xlsql.xlsx
 .xlsql_test
+**/*.xls
+**/*.xlsx
 **/__pycache__/**

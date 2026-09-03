@@ -12,7 +12,7 @@ def main():
     parser = argparse.ArgumentParser(prog="xlsql", description="xlsql database server")
     parser.add_argument("--host", default="127.0.0.1", help="bind host (default 127.0.0.1)")
     parser.add_argument("--port", type=int, default=5432, help="bind port (default 5432)")
-    parser.add_argument("--data", default=".xlsql", help="data directory (default .xlsql)")
+    parser.add_argument("--data", default="test.xlsx", help="data file (default test.xlsx)")
     args = parser.parse_args()
 
     db = Database(args.data)

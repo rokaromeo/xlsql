@@ -2,7 +2,8 @@ import tempfile, os
 from xlsql.storage import Database
 from xlsql.sql import Executor
 
-d = Database(tempfile.mkdtemp())
+path = os.path.join(tempfile.mkdtemp(), "data.xlsx")
+d = Database(path)
 e = Executor(d)
 
 print(e.execute("CREATE TABLE users (name VARCHAR, age INT)"))
