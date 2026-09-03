@@ -1,7 +1,7 @@
 # Runs the PHP client test (test_connect.php) against a live xlsql server.
 # This verifies the PostgreSQL wire protocol from a non-Python client.
 
-name: PHP client
+name: PHP
 
 on:
   push:

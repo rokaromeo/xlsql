@@ -1,7 +1,7 @@
 # This workflow installs Python dependencies, runs linting with flake8,
 # and executes the unit tests with pytest on push and pull request events.
 
-name: Python client
+name: Python
 
 on:
   push:
