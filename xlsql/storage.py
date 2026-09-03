@@ -87,6 +87,8 @@ class Database:
     """Manages a single .xlsx workbook where each sheet is a table."""
 
     def __init__(self, filepath):
+        if not filepath.lower().endswith(".xlsx"):
+            filepath = f"{filepath}.xlsx"
         self.filepath = filepath
         self._lock = threading.RLock()
         self._wb = self._open(filepath)
