@@ -113,7 +113,8 @@ Connect with PHP (PDO)
 TODO
 ====
 
-- Multiple database support
-- Column data types
-- ORDER BY / LIMIT / OFFSET
-- Aggregate functions
+- Multiple database support - no, do not implement this. Ever.
+- Column data types - later.
+- ORDER BY / LIMIT / OFFSET - later.
+- Aggregate functions - later.
+- The server does not exit when I press ctrl+c in the terminal, it keeps running. I pressed the ctrl+c key combination more than two times in rapid succession. Implement a feature to gracefully quit if someone presses ctrl+c.
