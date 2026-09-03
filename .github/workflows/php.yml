@@ -53,6 +53,12 @@ jobs:
           php-version: "8.3"
           extensions: pgsql, pdo, pdo_pgsql
 
+      - name: Lint PHP files
+        run: |
+          for file in $(git ls-files '*.php'); do
+            php -l "$file"
+          done
+
       - name: Run PHP client test
         run: php test_connect.php
 
