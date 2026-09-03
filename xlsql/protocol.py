@@ -2,6 +2,8 @@ import socket
 import struct
 import threading
 
+from .sql import summarize
+
 
 class WireError(Exception):
     pass
@@ -183,7 +185,7 @@ class PgConnection:
             self._fail_parse("malformed parse message")
             return
         sql = parts[1].decode("utf-8").strip()
-        self.log("SQL", sql)
+        self.log_sql(sql)
         try:
             self._stmt_result = self.on_query(sql)
         except Exception as e:
@@ -231,7 +233,7 @@ class PgConnection:
 
     def _handle_query(self, body):
         sql = body.rstrip(b"\x00").decode("utf-8").strip()
-        self.log("SQL", sql)
+        self.log_sql(sql)
         try:
             result = self.on_query(sql)
         except Exception as e:
@@ -277,6 +279,10 @@ class PgConnection:
     def log(self, tag, msg):
         if self.logger:
             self.logger(f"[{tag}] {msg}")
+
+    def log_sql(self, sql):
+        if self.logger:
+            self.logger(f"[SQL] {summarize(sql)}")
 
 
 class PgServer:

@@ -94,6 +94,29 @@ def parse(sql):
     p.finish()
 
 
+def summarize(sql):
+    """Return a short 'command + table' summary of a SQL statement."""
+    tokens = tokenize(sql)
+    p = Parser(tokens)
+    kind, keyword = p.next()
+    if kind != "IDENT":
+        return "?"
+    stmt = keyword.upper()
+    if stmt == "CREATE":
+        return f"CREATE TABLE {parse_create(p)[1]}"
+    if stmt == "DROP":
+        return f"DROP TABLE {parse_drop(p)[1]}"
+    if stmt == "INSERT":
+        return f"INSERT INTO {parse_insert(p)[1]}"
+    if stmt == "SELECT":
+        return f"SELECT FROM {parse_select(p)[1]}"
+    if stmt == "UPDATE":
+        return f"UPDATE {parse_update(p)[1]}"
+    if stmt == "DELETE":
+        return f"DELETE FROM {parse_delete(p)[1]}"
+    return stmt
+
+
 def parse_create(p):
     kind, val = p.next()
     if (kind, val) != ("IDENT", "table"):
