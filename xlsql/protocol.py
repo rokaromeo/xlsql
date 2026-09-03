@@ -1,5 +1,6 @@
 import socket
 import struct
+import threading
 
 
 class WireError(Exception):
@@ -216,11 +217,19 @@ class PgServer:
         self.port = port
         self.on_query = on_query
         self.logger = logger
+        self._shutdown = threading.Event()
+
+    def shutdown(self):
+        self._shutdown.set()
 
     def serve_forever(self):
+        self.sock.settimeout(1.0)
         try:
-            while True:
-                conn, addr = self.sock.accept()
+            while not self._shutdown.is_set():
+                try:
+                    conn, addr = self.sock.accept()
+                except socket.timeout:
+                    continue
                 if self.logger:
                     self.logger(f"[CONNECT] {addr[0]}:{addr[1]}")
                 c = PgConnection(conn, logger=self.logger, on_query=self.on_query)
@@ -229,6 +238,5 @@ class PgServer:
             self.sock.close()
 
     def _handle_conn(self, conn_obj, addr):
-        import threading
         t = threading.Thread(target=conn_obj.handle, daemon=True)
         t.start()

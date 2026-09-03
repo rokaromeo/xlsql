@@ -1,5 +1,6 @@
 import argparse
 import os
+import signal
 import sys
 
 from xlsql.protocol import PgServer
@@ -27,11 +28,16 @@ def main():
     log(f"tables found: {db.list_tables() or 'none'}")
 
     server = PgServer(args.host, args.port, on_query, logger=log)
-    log("ready for connections")
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
+
+    def handle_sigint(signum, frame):
         log("shutting down")
+        server.shutdown()
+
+    signal.signal(signal.SIGINT, handle_sigint)
+
+    log("ready for connections")
+    server.serve_forever()
+    log("shutdown complete")
     return 0
 
 
