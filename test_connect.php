@@ -23,10 +23,6 @@ try {
     echo "none to drop\n";
 }
 
-echo "== CREATE TABLE ==\n";
-$pdo->exec("CREATE TABLE users (name TEXT, age INT)");
-echo "ok\n";
-
 echo "== CREATE TABLE IF NOT PRESENT ==\n";
 $pdo->exec("CREATE TABLE IF NOT PRESENT users (name TEXT, age INT)");
 echo "ok\n";
@@ -34,6 +30,14 @@ echo "ok\n";
 echo "== INSERT ==\n";
 $pdo->exec("INSERT INTO users (name, age) VALUES ('Alice', 30)");
 $pdo->exec("INSERT INTO users (name, age) VALUES ('Bob', 25)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
 echo "ok\n";
 
 echo "== SELECT ==\n";

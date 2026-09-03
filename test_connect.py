@@ -20,13 +20,21 @@ try:
 except psycopg.errors.SyntaxError:
     print("none to drop")
 
-print("== CREATE TABLE ==")
-cur.execute("CREATE TABLE users (name TEXT, age INT)")
+print("== CREATE TABLE (if not present) ==")
+cur.execute("CREATE TABLE IF NOT PRESENT users (name TEXT, age INT)")
 print("ok")
 
 print("== INSERT ==")
 cur.execute("INSERT INTO users (name, age) VALUES ('Alice', 30)")
 cur.execute("INSERT INTO users (name, age) VALUES ('Bob', 25)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Foo', 111)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Foo', 111)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Foo', 111)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Foo', 111)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Bar', 222)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Bar', 222)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Bar', 222)")
+cur.execute("INSERT INTO users (name, age) VALUES ('Bar', 222)")
 print("ok")
 
 print("== SELECT ==")
