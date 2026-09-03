@@ -4,6 +4,13 @@ conn = psycopg.connect("host=127.0.0.1 port=54330 dbname=test user=test password
 conn.autocommit = True
 cur = conn.cursor()
 
+print("== DROP TABLE (if present) ==")
+try:
+    cur.execute("DROP TABLE users")
+    print("dropped existing")
+except psycopg.errors.SyntaxError:
+    print("none to drop")
+
 print("== CREATE TABLE ==")
 cur.execute("CREATE TABLE users (name TEXT, age INT)")
 print("ok")

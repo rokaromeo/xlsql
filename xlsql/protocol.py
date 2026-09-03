@@ -65,7 +65,7 @@ class PgConnection:
         for name in columns:
             payload += PgConnection.cstring(name)
             # table oid, attr num, type oid, typlen, typmod, format
-            payload += struct.pack("!IHIHIH", 0, 0, 25, -1, -1, 0)
+            payload += struct.pack("!IhIhih", 0, 0, 25, -1, -1, 0)
         return payload
 
     @staticmethod

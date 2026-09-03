@@ -22,7 +22,22 @@ def main():
         print(f"[{os.getpid()}] {msg}", flush=True)
 
     def on_query(sql):
-        return executor.execute(sql)
+        result = executor.execute(sql)
+        kind = result[0]
+        if kind == "select":
+            _, columns, rows = result
+            return {"kind": "select", "columns": columns, "rows": rows}
+        if kind == "create":
+            return {"kind": "create", "name": result[1]}
+        if kind == "drop":
+            return {"kind": "drop", "name": result[1]}
+        if kind == "insert":
+            return {"kind": "insert", "newid": result[1]}
+        if kind == "update":
+            return {"kind": "update", "changed": result[1]}
+        if kind == "delete":
+            return {"kind": "delete", "deleted": result[1]}
+        raise SQLSyntaxError(f"unsupported result kind: {kind}")
 
     log(f"xlsql server starting on {args.host}:{args.port}, data dir: {os.path.abspath(args.data)}")
     log(f"tables found: {db.list_tables() or 'none'}")
