@@ -1,0 +1,4 @@
+openpyxl
+psycopg
+pytest
+flake8
