@@ -118,3 +118,8 @@ TODO
 - ORDER BY / LIMIT / OFFSET - later.
 - Aggregate functions - later.
 - The server does not exit when I press ctrl+c in the terminal, it keeps running. I pressed the ctrl+c key combination more than two times in rapid succession. Implement a feature to gracefully quit if someone presses ctrl+c. - I tried this just now, works.
+
+- There is this line in the test:
+```print("== DROP TABLE (if present) ==")```
+
+I would like you to implement DROP TABLE IF PRESENT and CREATE TABLE IF NOT PRESENT functionality. These work like IF EXISTS, but I like the present.
