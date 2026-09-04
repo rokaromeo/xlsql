@@ -38,7 +38,7 @@ jobs:
     # repository files, then wait for port 5432 to accept connections.
     - name: Start xlsql server
       run: |
-        python server.py --host 127.0.0.1 --port 5432 --data ./ci_data.xlsx > server.log 2>&1 &
+          python server.py --host 127.0.0.1 --port 5432 --data ./build/go/data.xlsx > server.log 2>&1 &
         echo $! > server.pid
         for i in $(seq 1 30); do
           if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
@@ -53,10 +53,13 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v ./...
+      run: |
+        cd test/go
+        mkdir -p ../../build/go
+        go build -v -o ../../build/go/connect_test .
 
     - name: Run Go client test
-      run: go run .
+      run: ../../build/go/connect_test
 
     - name: Stop xlsql server
       if: always()

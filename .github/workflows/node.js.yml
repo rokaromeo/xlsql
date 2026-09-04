@@ -27,6 +27,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: ./test/nodejs/package-lock.json
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -42,7 +43,7 @@ jobs:
     # repository files, then wait for port 5432 to accept connections.
     - name: Start xlsql server
       run: |
-        python server.py --host 127.0.0.1 --port 5432 --data ./ci_data.xlsx > server.log 2>&1 &
+        python server.py --host 127.0.0.1 --port 5432 --data ./build/nodejs/data.xlsx > server.log 2>&1 &
         echo $! > server.pid
         for i in $(seq 1 30); do
           if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
@@ -57,9 +58,11 @@ jobs:
         fi
 
     - name: Install npm dependencies
+      working-directory: ./test/nodejs
       run: npm ci
 
     - name: Run Node.js client test
+      working-directory: ./test/nodejs
       run: npm test
 
     - name: Stop xlsql server

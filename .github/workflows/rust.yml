@@ -14,6 +14,7 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_TARGET_DIR: ../../build/rust
 
 jobs:
   build:
@@ -36,7 +37,7 @@ jobs:
     # repository files, then wait for port 5432 to accept connections.
     - name: Start xlsql server
       run: |
-        python server.py --host 127.0.0.1 --port 5432 --data ./ci_data.xlsx > server.log 2>&1 &
+        python server.py --host 127.0.0.1 --port 5432 --data ./build/rust/data.xlsx > server.log 2>&1 &
         echo $! > server.pid
         for i in $(seq 1 30); do
           if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
@@ -51,10 +52,14 @@ jobs:
         fi
 
     - name: Build
-      run: cargo build --verbose
+      run: |
+        cd test/rust
+        cargo build --verbose
 
     - name: Run Rust client test
-      run: cargo run --quiet
+      run: |
+        cd test/rust
+        cargo run --quiet
 
     - name: Stop xlsql server
       if: always()
