@@ -54,10 +54,12 @@ A WHERE clause accepts the comparison operators = <> > < >= <=, combined with AN
 TESTING
 -------
 
-    python server.py        # in one terminal
-    python test_connect.py  # in another
+    python server.py              # in one terminal
+    python test/python/test_connect.py  # in another
 
-The test runs the full suite of statements over the wire and removes the .xlsql directory afterwards, even if the test fails or is interrupted. It is important for me.
+The test runs the full suite of statements over the wire and removes the data file afterwards, even if the test fails or is interrupted. It is important for me.
+
+Client tests for the other languages live under `test/<language>` (go, nodejs, php, ruby, rust). Their dependencies (lockfiles, node_modules, bundles, vendored gems) stay in the same language folder, and any build outputs and CI data land in `build/<language>`.
 
 
 BUGS

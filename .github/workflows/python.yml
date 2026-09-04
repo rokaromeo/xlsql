@@ -40,4 +40,4 @@ jobs:
     - name: Test with pytest
       run: |
         # test_connect.py needs a live server, so it is excluded from CI
-        python -m pytest test_sql.py -v
+        python -m pytest test/python/test_sql.py -v
