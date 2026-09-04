@@ -45,7 +45,7 @@ Connect to `127.0.0.1:5432` (dbname=test, user=test, password=test, 3s timeout),
 ## GLOBAL RULES
 
 1. **Rule priority:** Lower number first. Complete one fully before starting the next.
-2. **Step order:** Follow steps numerically. Parallel only if no conflicts.
+2. **Step order:** Execute BEFORE steps first (numerical order), then the numbered steps (numerical order), then AFTER steps last (numerical order).
 
 ### RULE #1: All Connection Tests Must Be Identical
 
