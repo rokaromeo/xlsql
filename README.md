@@ -20,6 +20,8 @@ We needed these automations, because humans are lazy and forget things, and in g
 
 Finally with AI we can automate the automations, and I don't want to see the contents of a yaml config file ever again in my life.
 
+And now rewrite everything in rust.
+
 
 
 
