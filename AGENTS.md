@@ -49,6 +49,15 @@ Six client tests that each connect to a live server over TCP port 5432 and run t
 
 **Rule:** All connection tests across every language **must test the same things in the same order**. If you or the user adds a new test case (e.g., a new SQL statement, a new WHERE condition, a new error check) to any one language's test, you **must** immediately replicate that same test case in **all other** connection tests. Do not let a single language drift ahead of or behind the others. The purpose is to prove the server works correctly regardless of which client language connects to it.
 
+**When triggered, follow these steps:**
+
+1. **Read the modified test** to understand exactly what was added, changed, or removed.
+2. **Read all other connection test files** (Python, Node.js, Go, Ruby, PHP, Rust) to see their current state.
+3. **Implement the same test case in all other languages**, placing it in the same position within the sequence.
+4. **Use the same section header** (e.g., `== SELECT WHERE ==`) across all languages.
+5. **Use the same SQL statement and values** — do not adapt or simplify for a language's idioms.
+6. **Do not skip any language** — every connection test must have the new test case.
+
 #### What Each Connection Test Does
 
 Every test follows the **exact same sequence** to verify the server handles the full CRUD lifecycle:
@@ -200,6 +209,16 @@ Key details:
 **Trigger:** The user asks to add a new language for connection testing (e.g., Zig, Java, C#, Kotlin, etc.).
 
 **Rule:** When a new language is added for connection testing, it **must** run on all three platforms: GitHub Actions, Linux shell (`.sh`), and Windows batch (`.bat`). Do not add a language with only one or two runners. Always create all three: the GitHub Actions workflow, the `.sh` runner, and the `.bat` runner.
+
+**When triggered, follow these steps:**
+
+1. **Create the connection test** in `test/<LANG>/` — connect to `127.0.0.1:5432`, run the same SQL sequence as all other tests (see "What Each Connection Test Does"), print section headers, exit 0 on success, print `DONE`.
+2. **Create the dependency config** (if the language needs one): `package.json`, `go.mod`, `Cargo.toml`, `Gemfile`, etc.
+3. **Create `test_<LANG>.bat`** at the project root — `cd` into `test\<LANG>`, run the test, capture exit code, `cd` back, report pass/fail.
+4. **Create `test_<LANG>.sh`** at the project root — same pattern as the `.bat` but for bash.
+5. **Add calls to both master runners** — add `call test_<LANG>.bat` in `test.bat` and `bash test_<LANG>.sh` in `test.sh`, in the same position as the other languages.
+6. **Create `.github/workflows/<LANG>.yml`** — checkout, set up Python 3.11 + `requirements.txt`, start server with `--data ./build/<LANG>/data.xlsx`, poll port 5432, set up the target language, run the test, kill server with `if: always()`.
+7. **Update AGENTS.md** — add the new language to all relevant tables (Integration Tests, Per-Language Runner Patterns, Per-Language Workflow Differences, Dependencies).
 
 When adding a new language (e.g., Zig, Java, C#, etc.), you need to create **7 files** across 3 locations. Here is the complete checklist:
 
