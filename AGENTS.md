@@ -52,9 +52,9 @@ These apply to all rules at all times:
 
 #### RULE #1: All Connection Tests Must Be Identical Across Languages
 
-**Trigger:** The user asks to add, change, or remove a test case in any `test_<LANG>/` connection test file (e.g., adding a new WHERE condition, a new SQL statement, or an error check).
+**TRIGGER:** The user asks to add, change, or remove a test case in any `test_<LANG>/` connection test file (e.g., adding a new WHERE condition, a new SQL statement, or an error check).
 
-**Rule:** All connection tests across every language **must test the same things in the same order**. If you or the user adds a new test case (e.g., a new SQL statement, a new WHERE condition, a new error check) to any one language's test, you **must** immediately replicate that same test case in **all other** connection tests. Do not let a single language drift ahead of or behind the others. The purpose is to prove the server works correctly regardless of which client language connects to it.
+**RULE:** All connection tests across every language **must test the same things in the same order**. If you or the user adds a new test case (e.g., a new SQL statement, a new WHERE condition, a new error check) to any one language's test, you **must** immediately replicate that same test case in **all other** connection tests. Do not let a single language drift ahead of or behind the others. The purpose is to prove the server works correctly regardless of which client language connects to it.
 
 **When triggered, follow these steps:**
 
@@ -69,7 +69,7 @@ BEFORE 1: As you work through the steps, keep track of what worked and what did 
 
 AFTER 1: Using the notes you made in BEFORE 1 (actual steps taken, what worked, what did not, tips for the next agent), update this rule in AGENTS.md. Change the steps if needed so the next agent has a better, more accurate guide.
 
-#### What Each Connection Test Does
+AFTER 2: Check the README.md — update the GitHub Actions badges, testing documentation, or usage examples if the changes affect them.
 
 Every test follows the **exact same sequence** to verify the server handles the full CRUD lifecycle:
 
@@ -217,9 +217,9 @@ Key details:
 
 #### RULE #2: New Languages Must Work on All Three Platforms
 
-**Trigger:** The user asks to add a new language for connection testing (e.g., Zig, Java, C#, Kotlin, etc.).
+**TRIGGER:** The user asks to add a new language for connection testing (e.g., Zig, Java, C#, Kotlin, etc.).
 
-**Rule:** When a new language is added for connection testing, it **must** run on all three platforms: GitHub Actions, Linux shell (`.sh`), and Windows batch (`.bat`). Do not add a language with only one or two runners. Always create all three: the GitHub Actions workflow, the `.sh` runner, and the `.bat` runner.
+**RULE:** When a new language is added for connection testing, it **must** run on all three platforms: GitHub Actions, Linux shell (`.sh`), and Windows batch (`.bat`). Do not add a language with only one or two runners. Always create all three: the GitHub Actions workflow, the `.sh` runner, and the `.bat` runner.
 
 **When triggered, follow these steps:**
 
@@ -234,6 +234,8 @@ BEFORE 1: As you work through the steps, keep track of what worked and what did 
 7. **Update AGENTS.md** — add the new language to all relevant tables (Integration Tests, Per-Language Runner Patterns, Per-Language Workflow Differences, Dependencies).
 
 AFTER 1: Using the notes you made in BEFORE 1 (actual steps taken, what worked, what did not, tips for the next agent), update this rule in AGENTS.md. Change the steps if needed so the next agent has a better, more accurate guide.
+
+AFTER 2: Check the README.md — update the GitHub Actions badges, testing documentation, or usage examples if the changes affect them.
 
 When adding a new language (e.g., Zig, Java, C#, etc.), you need to create **7 files** across 3 locations. Here is the complete checklist:
 
