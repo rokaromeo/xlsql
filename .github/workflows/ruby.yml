@@ -32,10 +32,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev
+
     # Start the xlsql server on a fresh data file so it never collides with
     # repository files, then wait for port 5432 to accept connections.
     - name: Start xlsql server
       run: |
+        mkdir -p build/ruby
         python server.py --host 127.0.0.1 --port 5432 --data ./build/ruby/data.xlsx > server.log 2>&1 &
         echo $! > server.pid
         for i in $(seq 1 30); do
