@@ -194,6 +194,12 @@ class PgConnection:
             return
         self._stmt_error = False
         self.send_message("1", b"")  # ParseComplete
+        # ParameterDescription: int16 nparams followed by one oid per param
+        if len(parts) >= 3 and len(parts[2]) >= 2:
+            nparams = struct.unpack("!H", parts[2][0:2])[0]
+        else:
+            nparams = 0
+        self.send_message("t", struct.pack("!H", nparams))
 
     def _fail_parse(self, message):
         self._stmt_error = True

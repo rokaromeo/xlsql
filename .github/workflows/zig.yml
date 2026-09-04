@@ -1,0 +1,65 @@
+name: Zig
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up Zig
+      uses: mlugg/setup-zig@v1
+      with:
+        version: 0.13.0
+
+    - name: Start xlsql server
+      run: |
+        python server.py --host 127.0.0.1 --port 5432 --data ./build/zig/data.xlsx > server.log 2>&1 &
+        echo $! > server.pid
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+        if ! (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+          echo "server did not start" >&2
+          cat server.log >&2
+          exit 1
+        fi
+
+    - name: Build
+      run: |
+        cd test/zig
+        zig build
+
+    - name: Run Zig client test
+      run: |
+        cd test/zig
+        zig build run
+
+    - name: Stop xlsql server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          kill $(cat server.pid) || true
+        fi

@@ -49,6 +49,13 @@ Gemfile.lock
 vendor/
 composer.lock
 
+# Zig
+.zig-cache/
+zig-cache/
+zig-out/
+.zig-cache/**/*.o
+zig-pkg/
+
 # OS
 .DS_Store
 Thumbs.db
