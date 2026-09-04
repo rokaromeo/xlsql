@@ -29,7 +29,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest psycopg[binary]
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
@@ -37,7 +37,34 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
+    - name: Test SQL layer
       run: |
-        # test_connect.py needs a live server, so it is excluded from CI
         python -m pytest test/python/test_sql.py -v
+
+    # Start the xlsql server on a fresh data file so it never collides with
+    # repository files, then wait for port 5432 to accept connections.
+    - name: Start xlsql server
+      run: |
+        python server.py --host 127.0.0.1 --port 5432 --data ./build/python/data.xlsx > server.log 2>&1 &
+        echo $! > server.pid
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+        if ! (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then
+          echo "server did not start" >&2
+          cat server.log >&2
+          exit 1
+        fi
+
+    - name: Run Python client test
+      run: python test/python/test_connect.py
+
+    - name: Stop xlsql server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          kill $(cat server.pid) || true
+        fi
