@@ -1,6 +1,6 @@
-[![Python](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml)
+[![Python](https://github.com/rokaromeo/xlsql/actions/workflows/python.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/python.yml)
 [![PHP](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml)
-[![Node.js](https://github.com/rokaromeo/xlsql/actions/workflows/node.js.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/node.js.yml)
+[![Node](https://github.com/rokaromeo/xlsql/actions/workflows/nodejs.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/nodejs.yml)
 [![Go](https://github.com/rokaromeo/xlsql/actions/workflows/go.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/go.yml)
 [![Ruby](https://github.com/rokaromeo/xlsql/actions/workflows/ruby.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/ruby.yml)
 [![Rust](https://github.com/rokaromeo/xlsql/actions/workflows/rust.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/rust.yml)
