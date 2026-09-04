@@ -43,6 +43,13 @@ Six client tests that each connect to a live server over TCP port 5432 and run t
 | PHP | `test/php/test_connect.php` |
 | Rust | `test/rust/src/main.rs` |
 
+### GLOBAL RULES
+
+These apply to all rules at all times:
+
+1. **Rule priority:** When more than one rule is triggered simultaneously, follow the rule with the **lower number first** (e.g., RULE #1 before RULE #2). Complete it fully before moving to the next.
+2. **Step order:** When a rule is triggered, follow its steps **in numerical order by default**. Steps may be executed in parallel (e.g., via subagents) only if doing so will not create conflicts or ordering problems.
+
 #### RULE #1: All Connection Tests Must Be Identical Across Languages
 
 **Trigger:** The user asks to add, change, or remove a test case in any `test_<LANG>/` connection test file (e.g., adding a new WHERE condition, a new SQL statement, or an error check).
