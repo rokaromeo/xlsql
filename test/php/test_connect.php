@@ -30,14 +30,14 @@ echo "ok\n";
 echo "== INSERT ==\n";
 $pdo->exec("INSERT INTO users (name, age) VALUES ('Alice', 30)");
 $pdo->exec("INSERT INTO users (name, age) VALUES ('Bob', 25)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 1)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
-$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 2)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 111)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 111)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 111)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Foo', 111)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 222)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 222)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 222)");
+$pdo->exec("INSERT INTO users (name, age) VALUES ('Bar', 222)");
 echo "ok\n";
 
 echo "== SELECT ==\n";
@@ -69,4 +69,12 @@ echo "== DELETE ==\n";
 $n = $pdo->exec("DELETE FROM users WHERE name = 'Bob'");
 echo "rows deleted: ", $n, "\n";
 
-echo "== DONE ==\n";
+echo "== FINAL ==\n";
+$stmt = $pdo->query("SELECT * FROM users");
+foreach ($stmt as $row) {
+    echo "  ";
+    print_r($row);
+}
+
+$pdo = null;
+echo "DONE\n";
