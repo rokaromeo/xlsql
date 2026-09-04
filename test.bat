@@ -10,8 +10,12 @@ echo  xlsql test runner
 echo ========================================
 echo.
 
-echo [1/2] Starting xlsql server on %HOST%:%PORT% ...
-powershell -NoProfile -Command "$p = Start-Process -FilePath python -ArgumentList 'server.py --host %HOST% --port %PORT% --data %DATA%' -PassThru; Set-Content -Path .%PORT%.srvpid -Value $p.Id"
+echo [1/3] Delete build/*
+if exist build rmdir /s /q build
+mkdir build
+
+echo [2/3] Starting xlsql server on %HOST%:%PORT% ...
+powershell -NoProfile -Command "$p = Start-Process -FilePath python -ArgumentList 'server.py --host %HOST% --port %PORT% --data %DATA%' -WorkingDirectory . -RedirectStandardOutput 'build\server.log' -RedirectStandardError 'build\server.log.err' -PassThru; Set-Content -Path .%PORT%.srvpid -Value $p.Id"
 set /p SRVPID=<.%PORT%.srvpid
 del .%PORT%.srvpid 2>nul
 
@@ -38,50 +42,39 @@ exit /b 1
 :ready
 echo Server is up.
 echo.
-echo [2/2] Running client connect tests ...
+echo [3/3] Running client connect tests ...
 echo.
 
 set "FAILED=0"
 
 echo --- Python ---
-cd test\python
-python test_connect.py
+call test_python.bat
 if errorlevel 1 set "FAILED=1"
-cd ..\..
 echo.
 
 echo --- Node.js ---
-cd test\nodejs
-if not exist node_modules call npm install >nul
-call npm test
+call test_nodejs.bat
 if errorlevel 1 set "FAILED=1"
-cd ..\..
 echo.
 
 echo --- PHP ---
-php test\php\test_connect.php
+call test_php.bat
 if errorlevel 1 set "FAILED=1"
 echo.
 
 echo --- Ruby ---
-cd test\ruby
-call bundle exec ruby connect_test.rb
+call test_ruby.bat
 if errorlevel 1 set "FAILED=1"
-cd ..\..
 echo.
 
 echo --- Go ---
-cd test\go
-go run .
+call test_go.bat
 if errorlevel 1 set "FAILED=1"
-cd ..\..
 echo.
 
 echo --- Rust ---
-cd test\rust
-cargo run --quiet
+call test_rust.bat
 if errorlevel 1 set "FAILED=1"
-cd ..\..
 echo.
 
 echo.

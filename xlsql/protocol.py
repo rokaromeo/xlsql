@@ -108,11 +108,11 @@ class PgConnection:
     def handle(self):
         try:
             self._startup()
-        except WireError as e:
+        except (WireError, OSError):
             return
         try:
             self._main_loop()
-        except WireError:
+        except (WireError, OSError):
             pass
         finally:
             if self.on_terminate:
