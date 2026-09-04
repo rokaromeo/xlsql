@@ -1,15 +1,3 @@
-xlsql database server
-=====================
-
-It's an SQL server using Excel spreadsheets for the tables. Written in Python.
-
-It is not meant to be used for anything, I'm just playing with AI tools. This project seems like something that would require a lot of effort for me normally, way too much to spend on something like this.
-
-Now I play with different languages and Github actions:
-
-clients
-=======
-
 [![Python](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/python-app.yml)
 [![PHP](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/php.yml)
 [![Node.js](https://github.com/rokaromeo/xlsql/actions/workflows/node.js.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/node.js.yml)
@@ -17,6 +5,12 @@ clients
 [![Ruby](https://github.com/rokaromeo/xlsql/actions/workflows/ruby.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/ruby.yml)
 [![Rust](https://github.com/rokaromeo/xlsql/actions/workflows/rust.yml/badge.svg)](https://github.com/rokaromeo/xlsql/actions/workflows/rust.yml)
 
+xlsql database server
+=====================
+
+It's an SQL server using Excel spreadsheets for the tables. Written in Python.
+
+It is not meant to be used for anything, I'm just having fun and I made this.
 
 
 
@@ -70,9 +64,3 @@ BUGS
 ----
 
 There are no bugs.
-
-
-COPYING
--------
-
-This project is released under the MIT License. See the LICENSE file for the full terms. You may redistribute it and modify it, provided the copyright notice is preserved.
