@@ -58,12 +58,16 @@ These apply to all rules at all times:
 
 **When triggered, follow these steps:**
 
+BEFORE 1: As you work through the steps, keep track of what worked and what did not. Note the actual steps you had to take, any language-specific quirks you encountered, and anything that would help the next agent do this faster.
+
 1. **Read the modified test** to understand exactly what was added, changed, or removed.
 2. **Read all other connection test files** (Python, Node.js, Go, Ruby, PHP, Rust) to see their current state.
 3. **Implement the same test case in all other languages**, placing it in the same position within the sequence.
 4. **Use the same section header** (e.g., `== SELECT WHERE ==`) across all languages.
 5. **Use the same SQL statement and values** — do not adapt or simplify for a language's idioms.
 6. **Do not skip any language** — every connection test must have the new test case.
+
+AFTER 1: Using the notes you made in BEFORE 1 (actual steps taken, what worked, what did not, tips for the next agent), update this rule in AGENTS.md. Change the steps if needed so the next agent has a better, more accurate guide.
 
 #### What Each Connection Test Does
 
@@ -219,6 +223,8 @@ Key details:
 
 **When triggered, follow these steps:**
 
+BEFORE 1: As you work through the steps, keep track of what worked and what did not. Note the actual steps you had to take, any language-specific quirks you encountered, and anything that would help the next agent do this faster.
+
 1. **Create the connection test** in `test/<LANG>/` — connect to `127.0.0.1:5432`, run the same SQL sequence as all other tests (see "What Each Connection Test Does"), print section headers, exit 0 on success, print `DONE`.
 2. **Create the dependency config** (if the language needs one): `package.json`, `go.mod`, `Cargo.toml`, `Gemfile`, etc.
 3. **Create `test_<LANG>.bat`** at the project root — `cd` into `test\<LANG>`, run the test, capture exit code, `cd` back, report pass/fail.
@@ -226,6 +232,8 @@ Key details:
 5. **Add calls to both master runners** — add `call test_<LANG>.bat` in `test.bat` and `bash test_<LANG>.sh` in `test.sh`, in the same position as the other languages.
 6. **Create `.github/workflows/<LANG>.yml`** — checkout, set up Python 3.11 + `requirements.txt`, start server with `--data ./build/<LANG>/data.xlsx`, poll port 5432, set up the target language, run the test, kill server with `if: always()`.
 7. **Update AGENTS.md** — add the new language to all relevant tables (Integration Tests, Per-Language Runner Patterns, Per-Language Workflow Differences, Dependencies).
+
+AFTER 1: Using the notes you made in BEFORE 1 (actual steps taken, what worked, what did not, tips for the next agent), update this rule in AGENTS.md. Change the steps if needed so the next agent has a better, more accurate guide.
 
 When adding a new language (e.g., Zig, Java, C#, etc.), you need to create **7 files** across 3 locations. Here is the complete checklist:
 
