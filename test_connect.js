@@ -79,6 +79,10 @@ const client = new Client({
         console.log(' ', row);
     }
 
-    await client.end();
     console.log('DONE');
+
+    // The xlsql server never closes the TCP socket after a Terminate message,
+    // so `client.end()` would block forever waiting for the server to close.
+    // Force an explicit exit instead.
+    process.exit(0);
 })();
