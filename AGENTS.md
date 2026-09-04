@@ -46,6 +46,7 @@ Connect to `127.0.0.1:5432` (dbname=test, user=test, password=test, 3s timeout),
 
 1. **Rule priority:** Lower number first. Complete one fully before starting the next.
 2. **Step order:** Execute BEFORE steps first (numerical order), then the numbered steps (numerical order), then AFTER steps last (numerical order).
+3. **Rule announcement:** When a rule is triggered, notify the user: "TRIGGER WARNING! RULE #N is triggered by: [what triggered it]. Rule requirement: [what the rule requires]."
 
 ### RULE #1: All Connection Tests Must Be Identical
 
