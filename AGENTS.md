@@ -43,6 +43,10 @@ Six client tests that each connect to a live server over TCP port 5432 and run t
 | PHP | `test/php/test_connect.php` |
 | Rust | `test/rust/src/main.rs` |
 
+#### RULE: All Connection Tests Must Be Identical Across Languages
+
+All connection tests across every language **must test the same things in the same order**. If you or the user adds a new test case (e.g., a new SQL statement, a new WHERE condition, a new error check) to any one language's test, you **must** immediately replicate that same test case in **all other** connection tests. Do not let a single language drift ahead of or behind the others. The purpose is to prove the server works correctly regardless of which client language connects to it.
+
 #### What Each Connection Test Does
 
 Every test follows the **exact same sequence** to verify the server handles the full CRUD lifecycle:
@@ -188,6 +192,10 @@ Key details:
 ---
 
 ## Adding a New Language — Step by Step
+
+#### RULE: New Languages Must Work on All Three Platforms
+
+When a new language is added for connection testing, it **must** run on all three platforms: GitHub Actions, Linux shell (`.sh`), and Windows batch (`.bat`). Do not add a language with only one or two runners. Always create all three: the GitHub Actions workflow, the `.sh` runner, and the `.bat` runner.
 
 When adding a new language (e.g., Zig, Java, C#, etc.), you need to create **7 files** across 3 locations. Here is the complete checklist:
 
