@@ -43,6 +43,7 @@ bin/
 # Ruby
 .tmp/
 vendor/bundle/
+Gemfile.lock
 
 # PHP
 vendor/
