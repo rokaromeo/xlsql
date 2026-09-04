@@ -38,7 +38,7 @@ yarn-error.log*
 bin/
 
 # Rust / Cargo
-/target/
+**/target/
 
 # Ruby
 .tmp/
