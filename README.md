@@ -12,9 +12,9 @@ It's an SQL server using Excel spreadsheets for the tables. Written in Python.
 
 I'm not using this software at all and you should not use it either, I'm just having fun making it. Everything about this project reminds me of what modern development became: environments, configs, setup this to work with that, package managers, update the dependencies...
 
-It became a constant stream of failures and fixes, endless config files. Same old problems over and over again. Feels like making a lot of progress and doing a good job, but no one ever going to look at any of thism, no one wants to, but they will be forced to when it turns to shit eventually and something fails.
+It became a constant stream of failures and fixes, endless config files. Same old problems over and over again. Feels like making a lot of progress and doing a good job, but no one ever going to look at any of this, no one wants to, but they will be forced to when it turns to shit eventually and something fails.
 
-AI agentic coding is the solution. I really enjoy looking at it going through the hell of software development with ease. I don't want to see the contents of a yaml config file ever again in my life.
+AI agentic coding is the solution. I really enjoy looking at it going through the hell of software development like a tank. I don't want to see the contents of a yaml config file ever again in my life.
 
 Creating automations just because humans are lazy, forget things and in general very bad when it comes to endless boring repetitive things. By now automating things is shit, boring, lots of problems, lots of the same problems, and now I know it will be like this forever, when you think you solved something, no you did not really, it just works now and it is going to fail in the future. 
 
