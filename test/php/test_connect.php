@@ -69,6 +69,12 @@ echo "== DELETE ==\n";
 $n = $pdo->exec("DELETE FROM users WHERE name = 'Bob'");
 echo "rows deleted: ", $n, "\n";
 
+echo "== SELECT AGAIN ==\n";
+$stmt = $pdo->query("SELECT id, name, age FROM users WHERE name = 'Bob'");
+$count = $stmt->rowCount();
+echo "  expected 0 rows, got ", $count, "\n";
+assert($count === 0);
+
 echo "== FINAL ==\n";
 $stmt = $pdo->query("SELECT * FROM users");
 foreach ($stmt as $row) {

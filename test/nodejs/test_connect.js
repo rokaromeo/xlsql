@@ -73,6 +73,11 @@ const client = new Client({
     res = await exec("DELETE FROM users WHERE name = 'Bob'");
     console.log('rows deleted:', res.rowCount);
 
+    console.log('== SELECT AGAIN ==');
+    res = await exec("SELECT id, name, age FROM users WHERE name = 'Bob'");
+    console.log('  expected 0 rows, got', res.rows.length);
+    if (res.rows.length !== 0) throw new Error('expected 0 rows');
+
     console.log('== FINAL ==');
     res = await exec('SELECT * FROM users');
     for (const row of res.rows) {

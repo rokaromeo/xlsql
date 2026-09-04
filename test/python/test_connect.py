@@ -60,6 +60,12 @@ print("== DELETE ==")
 cur.execute("DELETE FROM users WHERE name = 'Bob'")
 print("rows deleted:", cur.rowcount)
 
+print("== SELECT AGAIN ==")
+cur.execute("SELECT id, name, age FROM users WHERE name = 'Bob'")
+rows = cur.fetchall()
+print("  expected 0 rows, got", len(rows))
+assert len(rows) == 0
+
 print("== FINAL ==")
 cur.execute("SELECT * FROM users")
 for row in cur.fetchall():

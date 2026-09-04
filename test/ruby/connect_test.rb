@@ -71,6 +71,12 @@ puts '== DELETE =='
 result = conn.exec("DELETE FROM users WHERE name = 'Bob'")
 puts "rows deleted: #{result.cmd_tuples}"
 
+puts '== SELECT AGAIN =='
+conn.exec("SELECT id, name, age FROM users WHERE name = 'Bob'") do |result|
+  puts "  expected 0 rows, got #{result.ntuples}"
+  raise 'expected 0 rows' unless result.ntuples == 0
+end
+
 puts '== FINAL =='
 conn.exec('SELECT * FROM users') do |result|
   result.each { |row| puts "  #{row}" }

@@ -111,6 +111,20 @@ async fn main() {
             }
         }
 
+        println!("== SELECT AGAIN ==");
+        let messages = client
+            .simple_query("SELECT id, name, age FROM users WHERE name = 'Bob'")
+            .await
+            .unwrap();
+        let mut count = 0;
+        for message in &messages {
+            if let SimpleQueryMessage::Row(_) = message {
+                count += 1;
+            }
+        }
+        println!("  expected 0 rows, got {}", count);
+        assert_eq!(count, 0);
+
         println!("== FINAL ==");
         dump(&client, "SELECT * FROM users").await;
     })

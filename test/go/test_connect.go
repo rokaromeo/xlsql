@@ -89,6 +89,19 @@ func main() {
 		fmt.Println("rows deleted:", tag.RowsAffected())
 	}
 
+	fmt.Println("== SELECT AGAIN ==")
+	rows, _ = conn.Query(ctx, "SELECT id, name, age FROM users WHERE name = 'Bob'")
+	count := 0
+	for rows.Next() {
+		count++
+	}
+	rows.Close()
+	fmt.Println("  expected 0 rows, got", count)
+	if count != 0 {
+		fmt.Println("FAIL: expected 0 rows")
+		os.Exit(1)
+	}
+
 	fmt.Println("== FINAL ==")
 	rows, _ = conn.Query(ctx, "SELECT * FROM users")
 	for rows.Next() {
